@@ -2,15 +2,41 @@
 
 import sys
 
+LDI = 0b10000010
+PRN = 0b01000111
+HLT = 0b00000001
+
 
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
-        # The syntax below makes a list filled with 0's to the amount to the right
-        self.ram = [0] * 255  # List with 255 0's
-        self.register = [0] * 8  # List with 8 0's
+        # Create Memory
+        self.ram = [0] * 256
+        # Create Register
+        self.reg = [0] * 8
+
+        # Create program counter
+        self.pc = 0
+
+        # Running CPU is true
+        self.running = True
+        self.PC = self.reg[0]
+        self.IM = self.reg[5]
+        self.IS = self
+
+    def LDI_function(self, a, b):
+        self.reg[a] = b
+        self.pc += 3
+
+    def PRN_function(self, a):
+        print(f'{self.reg[a]}')
+        self.pc += 2
+
+    def HLT_function(self):
+        self.running = False
+        self.pc += 1
 
     def load(self):
         """Load a program into memory."""
@@ -21,12 +47,12 @@ class CPU:
 
         program = [
             # From print8.ls8
-            0b10000010,  # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111,  # PRN R0
-            0b00000000,
-            0b00000001,  # HLT
+            0b10000010,  # LDI R0,8 --> LOAD IMMEDIATELY
+            0b00000000,  # R0
+            0b00001000,  # 8
+            0b01000111,  # PRN --> PRINT
+            0b00000000,  # R0
+            0b00000001,  # HLT --> STOP
         ]
 
         for instruction in program:
@@ -62,6 +88,37 @@ class CPU:
 
         print()
 
+    # byte refers to the address
+
+    def ram_read(self, byte):
+        return self.ram[byte]
+
+    # byte refers to the address
+    # change refers to the new item to be added
+
+    def ram_write(self, byte, change):
+        self.ram[byte] = change
+        return self.ram[byte]
+
     def run(self):
         """Run the CPU."""
-        pass
+        while self.running:
+            # self.trace()
+            # Setting current to IR
+            ir = self.ram_read(self.pc)
+
+            # Get PC+1
+            operand_a = self.ram_read(self.pc+1)
+            # Get PC+2
+            operand_b = self.ram_read(self.pc+2)
+
+            if ir == LDI:
+                self.LDI_function(operand_a, operand_b)
+            elif ir == PRN:
+                self.PRN_function(operand_a)
+            elif ir == HLT:
+                self.running = False
+            else:
+                self.running = False
+                print(f"I did not understand that ir: {ir}")
+                sys.exit(1)
