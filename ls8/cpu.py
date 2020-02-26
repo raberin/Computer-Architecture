@@ -8,10 +8,6 @@ HLT = 0b00000001
 MUL = 0b10100010
 
 
-def decimalToBinary(n):
-    return bin(n).replace("0b", "")
-
-
 class CPU:
     """Main CPU class."""
 
@@ -27,9 +23,9 @@ class CPU:
 
         # Running CPU is true
         self.running = True
-        self.PC = self.reg[0]
-        self.IM = self.reg[5]
-        self.IS = self
+        # self.PC = self.reg[0]
+        # self.IM = self.reg[5]
+        # self.IS = self
 
     def LDI_function(self, a, b):
         self.reg[a] = b
@@ -57,19 +53,15 @@ class CPU:
                     comment_split = line.strip().split("#")
 
                     # Cast the values from str -> int
-                    value = int(comment_split[0].strip())
+                    value = comment_split[0].strip()
 
                     # Ignore blank lines
                     if value == '':
                         continue
 
-                    # convert_to_binary = bin(value).replace("0b", "")
-                    # print(convert_to_binary)
-                    # print(convert_to_binary)
-                    # print(type(convert_to_binary))
-                    # print("========")
-                    # num = bin(convert_to_binary)
-                    self.ram[address] = value
+                    convert_to_binary = '0b' + value
+                    num = int(convert_to_binary, 2)
+                    self.ram[address] = num
                     address += 1
 
         except FileNotFoundError:
@@ -138,7 +130,8 @@ class CPU:
     def run(self):
         """Run the CPU."""
         while self.running:
-            # self.trace()
+            self.trace()
+            print('--------')
             # Setting current to IR
             ir = self.ram_read(self.pc)
 
