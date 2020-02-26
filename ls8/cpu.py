@@ -6,6 +6,7 @@ LDI = 0b10000010
 PRN = 0b01000111
 HLT = 0b00000001
 MUL = 0b10100010
+ADD = 0b10100000
 
 
 class CPU:
@@ -75,25 +76,17 @@ class CPU:
         print(self.ram)
         print(type(self.ram[0]))
 
-        # For now, we've just hardcoded a program:
-        # program = [
-        #     # From print8.ls8
-        #     0b10000010,  # LDI R0,8 --> LOAD IMMEDIATELY
-        #     0b00000000,  # R0
-        #     0b00001000,  # 8
-        #     0b01000111,  # PRN --> PRINT
-        #     0b00000000,  # R0
-        #     0b00000001,  # HLT --> STOP
-        # ]
-
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
-
+        print(
+            f"reg[reg_a] = {self.reg[reg_a]},reg[reg_b] = {self.reg[reg_b] }")
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
+            self.pc += 3
         # elif op == "SUB": etc
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+            self.pc += 3
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -146,6 +139,8 @@ class CPU:
                 self.PRN_function(operand_a)
             elif ir == HLT:
                 self.running = False
+            elif ir == ADD:
+                self.alu('ADD', operand_a, operand_b)
             elif ir == MUL:
                 self.alu('MUL', operand_a, operand_b)
             else:
