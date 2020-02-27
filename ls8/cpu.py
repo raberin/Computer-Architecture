@@ -30,9 +30,6 @@ class CPU:
 
         # Running CPU is true
         self.running = True
-        # self.PC = self.reg[0]
-        # self.IM = self.reg[5]
-        # self.IS = self
 
     def LDI_function(self, a, b):
         self.reg[a] = b
@@ -99,11 +96,11 @@ class CPU:
             # Increment pc
             self.pc += 2
         elif op == "POP":
-            # Increment stack pointer
             # Set reg to popped value
             self.reg[reg_a] = self.ram[self.sp]
             # Increment pc
             self.sp += 1
+            # Increment stack pointer
             self.pc += 2
         else:
             raise Exception("Unsupported ALU operation")
@@ -141,8 +138,6 @@ class CPU:
     def run(self):
         """Run the CPU."""
         while self.running:
-            # self.trace()
-            # print('--------')
             # Setting current to IR
             ir = self.ram_read(self.pc)
 
@@ -156,8 +151,7 @@ class CPU:
             elif ir == PRN:
                 self.PRN_function(operand_a)
             elif ir == HLT:
-                # print(self.ram)
-                self.running = False
+                self.HLT_function()
             elif ir == ADD:
                 self.alu('ADD', operand_a, operand_b)
             elif ir == SUB:
